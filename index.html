@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ビジネスアスリート3本柱</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#f7f7f8" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#121214" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="3本柱">
+<link rel="apple-touch-icon" href="icon-192.svg">
+<style>
+  :root {
+    --bg: #f7f7f8;
+    --surface: #ffffff;
+    --text: #1a1a1a;
+    --text-muted: #666;
+    --border: #e5e5e7;
+    --english: #2563eb;
+    --training: #ea580c;
+    --side: #16a34a;
+    --selfcare: #9333ea;
+    --accent: #111;
+    --cal-0: #ebedf0;
+    --cal-1: #c6e48b;
+    --cal-2: #7bc96f;
+    --cal-3: #239a3b;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #121214;
+      --surface: #1e1e22;
+      --text: #f0f0f0;
+      --text-muted: #999;
+      --border: #2e2e34;
+      --accent: #fff;
+      --cal-0: #2a2a30;
+      --cal-1: #0e4429;
+      --cal-2: #006d32;
+      --cal-3: #26a641;
+    }
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: var(--bg); color: var(--text); }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Yu Gothic UI", system-ui, sans-serif;
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 16px 16px 40px;
+    line-height: 1.5;
+  }
+
+  header {
+    padding: 16px 0 20px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 16px;
+  }
+  h1 { font-size: 1.3rem; margin: 0 0 4px; letter-spacing: 0.02em; }
+  #today-date { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 8px; }
+  .summary {
+    font-size: 1.05rem;
+    font-weight: 600;
+    padding: 10px 14px;
+    background: var(--surface);
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    display: inline-block;
+  }
+
+  section { margin-bottom: 8px; }
+  h2 {
+    font-size: 0.95rem;
+    margin: 24px 0 8px;
+    padding-left: 10px;
+    border-left: 4px solid var(--accent);
+    font-weight: 600;
+  }
+  h2.english { border-color: var(--english); color: var(--english); }
+  h2.training { border-color: var(--training); color: var(--training); }
+  h2.side { border-color: var(--side); color: var(--side); }
+  h2.selfcare { border-color: var(--selfcare); color: var(--selfcare); }
+  h2.section-title {
+    border-left: none;
+    padding-left: 0;
+    color: var(--text);
+    font-size: 1rem;
+    margin-top: 28px;
+  }
+
+  ul { list-style: none; padding: 0; margin: 0; }
+  li {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    margin-bottom: 8px;
+    overflow: hidden;
+    transition: background 0.15s;
+    position: relative;
+  }
+  li.english { border-left: 4px solid var(--english); }
+  li.training { border-left: 4px solid var(--training); }
+  li.side { border-left: 4px solid var(--side); }
+  li.selfcare { border-left: 4px solid var(--selfcare); }
+
+  label {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    cursor: pointer;
+    min-height: 52px;
+    padding: 6px 14px;
+    font-size: 1rem;
+    user-select: none;
+  }
+  .label-text { flex: 1; }
+  .streak {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .streak.active { color: #ea580c; }
+
+  input[type="checkbox"] {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 26px;
+    height: 26px;
+    min-width: 26px;
+    border: 2px solid var(--border);
+    border-radius: 6px;
+    background: var(--bg);
+    cursor: pointer;
+    position: relative;
+    transition: all 0.15s;
+  }
+  input[type="checkbox"]:checked {
+    background: var(--accent);
+    border-color: var(--accent);
+  }
+  input[type="checkbox"]:checked::after {
+    content: "";
+    position: absolute;
+    left: 7px;
+    top: 2px;
+    width: 7px;
+    height: 14px;
+    border: solid var(--bg);
+    border-width: 0 3px 3px 0;
+    transform: rotate(45deg);
+  }
+  li.english input[type="checkbox"]:checked { background: var(--english); border-color: var(--english); }
+  li.training input[type="checkbox"]:checked { background: var(--training); border-color: var(--training); }
+  li.side input[type="checkbox"]:checked { background: var(--side); border-color: var(--side); }
+  li.selfcare input[type="checkbox"]:checked { background: var(--selfcare); border-color: var(--selfcare); }
+
+  li:has(input:checked) { opacity: 0.85; }
+  li:has(input:checked) .label-text { text-decoration: line-through; color: var(--text-muted); }
+
+  /* Weekly section */
+  .weekly-info {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-left: 8px;
+  }
+
+  /* Calendar */
+  .calendar {
+    display: grid;
+    grid-template-columns: repeat(10, 1fr);
+    gap: 4px;
+    margin-top: 12px;
+  }
+  .cal-cell {
+    aspect-ratio: 1;
+    border-radius: 4px;
+    background: var(--cal-0);
+    cursor: pointer;
+    transition: transform 0.1s;
+    border: 1px solid transparent;
+  }
+  .cal-cell:hover { transform: scale(1.15); }
+  .cal-cell.today { border-color: var(--accent); }
+  .cal-cell.l1 { background: var(--cal-1); }
+  .cal-cell.l2 { background: var(--cal-2); }
+  .cal-cell.l3 { background: var(--cal-3); }
+
+  .cal-legend {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-top: 10px;
+    justify-content: flex-end;
+  }
+  .cal-legend .cal-cell {
+    width: 12px;
+    height: 12px;
+    aspect-ratio: auto;
+    cursor: default;
+  }
+  .cal-legend .cal-cell:hover { transform: none; }
+
+  /* Modal */
+  .modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    padding: 16px;
+  }
+  .modal-backdrop.show { display: flex; }
+  .modal {
+    background: var(--surface);
+    border-radius: 14px;
+    padding: 20px;
+    max-width: 360px;
+    width: 100%;
+    border: 1px solid var(--border);
+  }
+  .modal h3 { margin: 0 0 12px; font-size: 1.05rem; }
+  .modal ul { font-size: 0.95rem; }
+  .modal li { padding: 6px 0; background: none; border: none; margin: 0; border-radius: 0; }
+  .modal-close {
+    margin-top: 16px;
+    padding: 10px 16px;
+    background: var(--accent);
+    color: var(--bg);
+    border: none;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    width: 100%;
+  }
+
+  /* Footer (data management) */
+  footer {
+    margin-top: 36px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+  }
+  .data-buttons {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .data-btn {
+    flex: 1;
+    min-width: 100px;
+    padding: 12px 10px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text);
+    border-radius: 10px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    min-height: 44px;
+  }
+  .data-btn.danger { color: #dc2626; }
+  .data-btn.danger.armed { background: #dc2626; color: white; border-color: #dc2626; }
+  .data-msg {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-top: 10px;
+    min-height: 1.2em;
+  }
+  .data-msg.error { color: #dc2626; }
+  .data-msg.success { color: var(--side); }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>ビジネスアスリート3本柱</h1>
+  <div id="today-date"></div>
+  <div class="summary" id="today-summary"></div>
+</header>
+
+<section id="daily-section">
+  <h2 class="english">🇬🇧 英語</h2>
+  <ul>
+    <li class="english"><label><input type="checkbox" data-key="shadowing"><span class="label-text">シャドーイング 30分</span><span class="streak" data-streak="shadowing"></span></label></li>
+    <li class="english"><label><input type="checkbox" data-key="writing"><span class="label-text">英作文・フレーズ暗記 30分</span><span class="streak" data-streak="writing"></span></label></li>
+  </ul>
+
+  <h2 class="training">💪 筋トレ</h2>
+  <ul>
+    <li class="training"><label><input type="checkbox" data-key="training"><span class="label-text">筋トレ</span><span class="streak" data-streak="training"></span></label></li>
+    <li class="training"><label><input type="checkbox" data-key="protein"><span class="label-text">タンパク質 140g 達成</span><span class="streak" data-streak="protein"></span></label></li>
+  </ul>
+
+  <h2 class="side">💼 副業</h2>
+  <ul>
+    <li class="side"><label><input type="checkbox" data-key="xPost"><span class="label-text">X発信（1投稿以上）</span><span class="streak" data-streak="xPost"></span></label></li>
+  </ul>
+
+  <h2 class="selfcare">📓 セルフケア</h2>
+  <ul>
+    <li class="selfcare"><label><input type="checkbox" data-key="journaling"><span class="label-text">ジャーナリング</span><span class="streak" data-streak="journaling"></span></label></li>
+  </ul>
+</section>
+
+<section id="weekly-section">
+  <h2 class="section-title">📅 今週のチェック<span class="weekly-info" id="weekly-label"></span></h2>
+  <ul>
+    <li><label><input type="checkbox" data-week-key="note"><span class="label-text">📝 note 発信</span></label></li>
+    <li><label><input type="checkbox" data-week-key="facilitation"><span class="label-text">🇬🇧 ミーティング録画ファシリ練習（週1時間）</span></label></li>
+    <li><label><input type="checkbox" data-week-key="weighIn"><span class="label-text">⚖️ 体重・体脂肪率を計測</span></label></li>
+    <li><label><input type="checkbox" data-week-key="bodyPhoto"><span class="label-text">📷 体の写真記録</span></label></li>
+  </ul>
+</section>
+
+<section id="calendar-section">
+  <h2 class="section-title">📊 過去30日</h2>
+  <div class="calendar" id="calendar"></div>
+  <div class="cal-legend">
+    <span>少ない</span>
+    <span class="cal-cell"></span>
+    <span class="cal-cell l1"></span>
+    <span class="cal-cell l2"></span>
+    <span class="cal-cell l3"></span>
+    <span>多い</span>
+  </div>
+</section>
+
+<footer>
+  <h2 class="section-title">⚙️ データ管理</h2>
+  <div class="data-buttons">
+    <button class="data-btn" id="btn-export">エクスポート</button>
+    <button class="data-btn" id="btn-import">インポート</button>
+    <button class="data-btn danger" id="btn-reset">リセット</button>
+  </div>
+  <input type="file" id="import-file" accept="application/json,.json" style="display:none">
+  <div class="data-msg" id="data-msg"></div>
+</footer>
+
+<div class="modal-backdrop" id="modal-backdrop">
+  <div class="modal">
+    <h3 id="modal-title"></h3>
+    <ul id="modal-body"></ul>
+    <button class="modal-close" id="modal-close">閉じる</button>
+  </div>
+</div>
+
+<script>
+  const STORAGE_KEY = 'threePillarsTracker';
+  const DAILY_KEYS = ['shadowing', 'writing', 'training', 'protein', 'xPost', 'journaling'];
+  const DAILY_LABELS = {
+    shadowing: 'シャドーイング',
+    writing: '英作文',
+    training: '筋トレ',
+    protein: 'タンパク質',
+    xPost: 'X発信',
+    journaling: 'ジャーナリング'
+  };
+  const WEEK_KEYS = ['note', 'facilitation', 'weighIn', 'bodyPhoto'];
+
+  function pad2(n) { return String(n).padStart(2, '0'); }
+
+  function dateToStr(d) {
+    return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`;
+  }
+
+  function todayStr() { return dateToStr(new Date()); }
+
+  function getISOWeek(date) {
+    const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+    const dayNum = d.getUTCDay() || 7;
+    d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+    const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+    const weekNum = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+    return `${d.getUTCFullYear()}-W${pad2(weekNum)}`;
+  }
+
+  function loadData() {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) {
+      return {
+        version: '1.0',
+        settings: { createdAt: new Date().toISOString() },
+        dailyRecords: {},
+        weeklyRecords: {}
+      };
+    }
+    const data = JSON.parse(raw);
+    if (!data.weeklyRecords) data.weeklyRecords = {};
+    if (!data.dailyRecords) data.dailyRecords = {};
+    return data;
+  }
+
+  function saveData(data) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  }
+
+  function getTodayRecord(data) {
+    const key = todayStr();
+    if (!data.dailyRecords[key]) {
+      data.dailyRecords[key] = {};
+      DAILY_KEYS.forEach(k => data.dailyRecords[key][k] = false);
+    }
+    return data.dailyRecords[key];
+  }
+
+  function getThisWeekRecord(data) {
+    const key = getISOWeek(new Date());
+    if (!data.weeklyRecords[key]) {
+      data.weeklyRecords[key] = {};
+      WEEK_KEYS.forEach(k => data.weeklyRecords[key][k] = false);
+    }
+    return data.weeklyRecords[key];
+  }
+
+  function calcCompletion(record) {
+    if (!record) return 0;
+    const done = DAILY_KEYS.filter(k => record[k]).length;
+    return done / DAILY_KEYS.length;
+  }
+
+  function updateSummary(record) {
+    const done = DAILY_KEYS.filter(k => record[k]).length;
+    const total = DAILY_KEYS.length;
+    const pct = Math.round((done / total) * 100);
+    document.getElementById('today-summary').textContent = `今日: ${done}/${total} 達成（${pct}%）`;
+  }
+
+  function calcStreak(data, key) {
+    const today = new Date();
+    const todayKey = dateToStr(today);
+    const todayRec = data.dailyRecords[todayKey];
+    let streak = 0;
+    let cursor = new Date(today);
+
+    if (!todayRec || !todayRec[key]) {
+      cursor.setDate(cursor.getDate() - 1);
+    }
+    while (true) {
+      const k = dateToStr(cursor);
+      const rec = data.dailyRecords[k];
+      if (rec && rec[key]) {
+        streak++;
+        cursor.setDate(cursor.getDate() - 1);
+      } else {
+        break;
+      }
+    }
+    return streak;
+  }
+
+  function updateStreaks(data) {
+    document.querySelectorAll('[data-streak]').forEach(el => {
+      const key = el.dataset.streak;
+      const s = calcStreak(data, key);
+      if (s === 0) {
+        el.textContent = '🌱';
+        el.classList.remove('active');
+      } else {
+        el.textContent = `🔥 ${s}日`;
+        el.classList.add('active');
+      }
+    });
+  }
+
+  function renderCalendar(data) {
+    const cal = document.getElementById('calendar');
+    cal.innerHTML = '';
+    const today = new Date();
+    const todayKey = dateToStr(today);
+    const cells = [];
+    for (let i = 29; i >= 0; i--) {
+      const d = new Date(today);
+      d.setDate(d.getDate() - i);
+      cells.push(d);
+    }
+    cells.forEach(d => {
+      const key = dateToStr(d);
+      const rec = data.dailyRecords[key];
+      const pct = calcCompletion(rec);
+      const cell = document.createElement('div');
+      cell.className = 'cal-cell';
+      if (pct >= 1) cell.classList.add('l3');
+      else if (pct >= 0.5) cell.classList.add('l2');
+      else if (pct > 0) cell.classList.add('l1');
+      if (key === todayKey) cell.classList.add('today');
+      cell.title = `${key} (${Math.round(pct * 100)}%)`;
+      cell.addEventListener('click', () => showDayDetail(key, rec));
+      cal.appendChild(cell);
+    });
+  }
+
+  function showDayDetail(dateKey, rec) {
+    document.getElementById('modal-title').textContent = dateKey;
+    const body = document.getElementById('modal-body');
+    body.innerHTML = '';
+    if (!rec) {
+      body.innerHTML = '<li>記録なし</li>';
+    } else {
+      DAILY_KEYS.forEach(k => {
+        const li = document.createElement('li');
+        li.textContent = `${rec[k] ? '✅' : '⬜️'} ${DAILY_LABELS[k]}`;
+        body.appendChild(li);
+      });
+    }
+    document.getElementById('modal-backdrop').classList.add('show');
+  }
+
+  function refreshAll() {
+    const data = loadData();
+    updateStreaks(data);
+    renderCalendar(data);
+  }
+
+  function showMsg(text, kind) {
+    const el = document.getElementById('data-msg');
+    el.textContent = text;
+    el.className = 'data-msg' + (kind ? ' ' + kind : '');
+    if (text) {
+      clearTimeout(showMsg._t);
+      showMsg._t = setTimeout(() => { el.textContent = ''; el.className = 'data-msg'; }, 4000);
+    }
+  }
+
+  function exportData() {
+    const data = loadData();
+    const json = JSON.stringify(data, null, 2);
+    const blob = new Blob([json], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `three-pillars-${todayStr()}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showMsg('エクスポートしました', 'success');
+  }
+
+  function importData(file) {
+    const reader = new FileReader();
+    reader.onload = e => {
+      try {
+        const parsed = JSON.parse(e.target.result);
+        if (!parsed || typeof parsed !== 'object' || !parsed.dailyRecords) {
+          throw new Error('不正なファイル形式');
+        }
+        if (!confirm('現在のデータを上書きします。よろしいですか？')) {
+          showMsg('インポートをキャンセルしました');
+          return;
+        }
+        if (!parsed.weeklyRecords) parsed.weeklyRecords = {};
+        if (!parsed.version) parsed.version = '1.0';
+        if (!parsed.settings) parsed.settings = { createdAt: new Date().toISOString() };
+        saveData(parsed);
+        showMsg('インポート完了。再描画します', 'success');
+        rebindCheckboxes();
+        refreshAll();
+        const todayRec = getTodayRecord(loadData());
+        updateSummary(todayRec);
+      } catch (err) {
+        showMsg('読み込み失敗: ' + err.message, 'error');
+      }
+    };
+    reader.readAsText(file);
+  }
+
+  function rebindCheckboxes() {
+    const data = loadData();
+    const record = getTodayRecord(data);
+    const weekRec = getThisWeekRecord(data);
+    document.querySelectorAll('input[data-key]').forEach(cb => {
+      cb.checked = !!record[cb.dataset.key];
+    });
+    document.querySelectorAll('input[data-week-key]').forEach(cb => {
+      cb.checked = !!weekRec[cb.dataset.weekKey];
+    });
+  }
+
+  function setupDataButtons() {
+    document.getElementById('btn-export').addEventListener('click', exportData);
+
+    const fileInput = document.getElementById('import-file');
+    document.getElementById('btn-import').addEventListener('click', () => fileInput.click());
+    fileInput.addEventListener('change', e => {
+      const file = e.target.files[0];
+      if (file) importData(file);
+      e.target.value = '';
+    });
+
+    const resetBtn = document.getElementById('btn-reset');
+    let armed = false;
+    let armTimer = null;
+    resetBtn.addEventListener('click', () => {
+      if (!armed) {
+        armed = true;
+        resetBtn.textContent = '本当に削除？(再タップ)';
+        resetBtn.classList.add('armed');
+        armTimer = setTimeout(() => {
+          armed = false;
+          resetBtn.textContent = 'リセット';
+          resetBtn.classList.remove('armed');
+        }, 4000);
+        return;
+      }
+      clearTimeout(armTimer);
+      armed = false;
+      resetBtn.textContent = 'リセット';
+      resetBtn.classList.remove('armed');
+      localStorage.removeItem(STORAGE_KEY);
+      rebindCheckboxes();
+      const data = loadData();
+      saveData(data);
+      const todayRec = getTodayRecord(data);
+      updateSummary(todayRec);
+      refreshAll();
+      showMsg('全データをリセットしました', 'success');
+    });
+  }
+
+  function init() {
+    const data = loadData();
+    const record = getTodayRecord(data);
+    const weekRec = getThisWeekRecord(data);
+    saveData(data);
+
+    const now = new Date();
+    document.getElementById('today-date').textContent =
+      `${now.getFullYear()}年${now.getMonth() + 1}月${now.getDate()}日 (${'日月火水木金土'[now.getDay()]})`;
+    document.getElementById('weekly-label').textContent = `${getISOWeek(now)}`;
+
+    document.querySelectorAll('input[data-key]').forEach(cb => {
+      const key = cb.dataset.key;
+      cb.checked = !!record[key];
+      cb.addEventListener('change', () => {
+        const data = loadData();
+        const rec = getTodayRecord(data);
+        rec[key] = cb.checked;
+        saveData(data);
+        updateSummary(rec);
+        updateStreaks(data);
+        renderCalendar(data);
+      });
+    });
+
+    document.querySelectorAll('input[data-week-key]').forEach(cb => {
+      const key = cb.dataset.weekKey;
+      cb.checked = !!weekRec[key];
+      cb.addEventListener('change', () => {
+        const data = loadData();
+        const wr = getThisWeekRecord(data);
+        wr[key] = cb.checked;
+        saveData(data);
+      });
+    });
+
+    setupDataButtons();
+
+    document.getElementById('modal-close').addEventListener('click', () => {
+      document.getElementById('modal-backdrop').classList.remove('show');
+    });
+    document.getElementById('modal-backdrop').addEventListener('click', (e) => {
+      if (e.target.id === 'modal-backdrop') {
+        e.currentTarget.classList.remove('show');
+      }
+    });
+
+    updateSummary(record);
+    updateStreaks(data);
+    renderCalendar(data);
+  }
+
+  init();
+
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('sw.js').catch(err => {
+        console.warn('Service Worker registration failed:', err);
+      });
+    });
+  }
+</script>
+
+</body>
+</html>
