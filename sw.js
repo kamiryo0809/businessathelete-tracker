@@ -1,4 +1,4 @@
-const CACHE_NAME = 'three-pillars-v1';
+const CACHE_NAME = 'three-pillars-v2';
 const ASSETS = [
   './',
   './index.html',

@@ -27,6 +27,7 @@
     --cal-1: #c6e48b;
     --cal-2: #7bc96f;
     --cal-3: #239a3b;
+    --danger: #dc2626;
   }
   @media (prefers-color-scheme: dark) {
     :root {
@@ -40,6 +41,7 @@
       --cal-1: #0e4429;
       --cal-2: #006d32;
       --cal-3: #26a641;
+      --danger: #f87171;
     }
   }
 
@@ -91,7 +93,7 @@
   }
 
   ul { list-style: none; padding: 0; margin: 0; }
-  li {
+  li.task {
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: 10px;
@@ -100,12 +102,12 @@
     transition: background 0.15s;
     position: relative;
   }
-  li.english { border-left: 4px solid var(--english); }
-  li.training { border-left: 4px solid var(--training); }
-  li.side { border-left: 4px solid var(--side); }
-  li.selfcare { border-left: 4px solid var(--selfcare); }
+  li.task.english { border-left: 4px solid var(--english); }
+  li.task.training { border-left: 4px solid var(--training); }
+  li.task.side { border-left: 4px solid var(--side); }
+  li.task.selfcare { border-left: 4px solid var(--selfcare); }
 
-  label {
+  label.task-label {
     display: flex;
     align-items: center;
     gap: 14px;
@@ -124,7 +126,7 @@
   }
   .streak.active { color: #ea580c; }
 
-  input[type="checkbox"] {
+  input[type="checkbox"].task-cb {
     appearance: none;
     -webkit-appearance: none;
     width: 26px;
@@ -137,11 +139,11 @@
     position: relative;
     transition: all 0.15s;
   }
-  input[type="checkbox"]:checked {
+  input[type="checkbox"].task-cb:checked {
     background: var(--accent);
     border-color: var(--accent);
   }
-  input[type="checkbox"]:checked::after {
+  input[type="checkbox"].task-cb:checked::after {
     content: "";
     position: absolute;
     left: 7px;
@@ -152,13 +154,20 @@
     border-width: 0 3px 3px 0;
     transform: rotate(45deg);
   }
-  li.english input[type="checkbox"]:checked { background: var(--english); border-color: var(--english); }
-  li.training input[type="checkbox"]:checked { background: var(--training); border-color: var(--training); }
-  li.side input[type="checkbox"]:checked { background: var(--side); border-color: var(--side); }
-  li.selfcare input[type="checkbox"]:checked { background: var(--selfcare); border-color: var(--selfcare); }
+  li.task.english input[type="checkbox"].task-cb:checked { background: var(--english); border-color: var(--english); }
+  li.task.training input[type="checkbox"].task-cb:checked { background: var(--training); border-color: var(--training); }
+  li.task.side input[type="checkbox"].task-cb:checked { background: var(--side); border-color: var(--side); }
+  li.task.selfcare input[type="checkbox"].task-cb:checked { background: var(--selfcare); border-color: var(--selfcare); }
 
-  li:has(input:checked) { opacity: 0.85; }
-  li:has(input:checked) .label-text { text-decoration: line-through; color: var(--text-muted); }
+  li.task:has(input.task-cb:checked) { opacity: 0.85; }
+  li.task:has(input.task-cb:checked) .label-text { text-decoration: line-through; color: var(--text-muted); }
+
+  .empty-msg {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    padding: 12px 0;
+    text-align: center;
+  }
 
   /* Weekly section */
   .weekly-info {
@@ -215,19 +224,28 @@
     justify-content: center;
     z-index: 100;
     padding: 16px;
+    overflow-y: auto;
   }
   .modal-backdrop.show { display: flex; }
   .modal {
     background: var(--surface);
     border-radius: 14px;
     padding: 20px;
-    max-width: 360px;
+    max-width: 420px;
     width: 100%;
     border: 1px solid var(--border);
+    max-height: 90vh;
+    overflow-y: auto;
   }
   .modal h3 { margin: 0 0 12px; font-size: 1.05rem; }
-  .modal ul { font-size: 0.95rem; }
-  .modal li { padding: 6px 0; background: none; border: none; margin: 0; border-radius: 0; }
+  .modal h4 {
+    font-size: 0.9rem;
+    margin: 18px 0 8px;
+    color: var(--text-muted);
+    font-weight: 600;
+  }
+  .modal ul.detail-list { font-size: 0.95rem; }
+  .modal ul.detail-list li { padding: 6px 0; background: none; border: none; margin: 0; border-radius: 0; }
   .modal-close {
     margin-top: 16px;
     padding: 10px 16px;
@@ -240,6 +258,59 @@
     cursor: pointer;
     width: 100%;
   }
+
+  /* Management modal */
+  .manage-row {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    margin-bottom: 6px;
+  }
+  .manage-row input[type="text"] {
+    flex: 1;
+    min-width: 0;
+    padding: 8px 10px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 0.95rem;
+    font-family: inherit;
+  }
+  .manage-row select {
+    padding: 8px 6px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 0.9rem;
+    font-family: inherit;
+    max-width: 110px;
+  }
+  .manage-row button.del {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--danger);
+    border-radius: 6px;
+    cursor: pointer;
+    padding: 6px 10px;
+    font-size: 1rem;
+    min-height: 38px;
+  }
+  .manage-row button.del:hover { background: var(--danger); color: white; }
+  .add-btn {
+    width: 100%;
+    padding: 10px;
+    margin-top: 6px;
+    border: 1px dashed var(--border);
+    background: transparent;
+    color: var(--text-muted);
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-family: inherit;
+  }
+  .add-btn:hover { color: var(--text); border-color: var(--text-muted); }
 
   /* Footer (data management) */
   footer {
@@ -264,16 +335,18 @@
     font-weight: 600;
     cursor: pointer;
     min-height: 44px;
+    font-family: inherit;
   }
-  .data-btn.danger { color: #dc2626; }
-  .data-btn.danger.armed { background: #dc2626; color: white; border-color: #dc2626; }
+  .data-btn.primary { background: var(--accent); color: var(--bg); border-color: var(--accent); }
+  .data-btn.danger { color: var(--danger); }
+  .data-btn.danger.armed { background: var(--danger); color: white; border-color: var(--danger); }
   .data-msg {
     font-size: 0.85rem;
     color: var(--text-muted);
     margin-top: 10px;
     min-height: 1.2em;
   }
-  .data-msg.error { color: #dc2626; }
+  .data-msg.error { color: var(--danger); }
   .data-msg.success { color: var(--side); }
 </style>
 </head>
@@ -286,37 +359,12 @@
 </header>
 
 <section id="daily-section">
-  <h2 class="english">🇬🇧 英語</h2>
-  <ul>
-    <li class="english"><label><input type="checkbox" data-key="shadowing"><span class="label-text">シャドーイング 30分</span><span class="streak" data-streak="shadowing"></span></label></li>
-    <li class="english"><label><input type="checkbox" data-key="writing"><span class="label-text">英作文・フレーズ暗記 30分</span><span class="streak" data-streak="writing"></span></label></li>
-  </ul>
-
-  <h2 class="training">💪 筋トレ</h2>
-  <ul>
-    <li class="training"><label><input type="checkbox" data-key="training"><span class="label-text">筋トレ</span><span class="streak" data-streak="training"></span></label></li>
-    <li class="training"><label><input type="checkbox" data-key="protein"><span class="label-text">タンパク質 140g 達成</span><span class="streak" data-streak="protein"></span></label></li>
-  </ul>
-
-  <h2 class="side">💼 副業</h2>
-  <ul>
-    <li class="side"><label><input type="checkbox" data-key="xPost"><span class="label-text">X発信（1投稿以上）</span><span class="streak" data-streak="xPost"></span></label></li>
-  </ul>
-
-  <h2 class="selfcare">📓 セルフケア</h2>
-  <ul>
-    <li class="selfcare"><label><input type="checkbox" data-key="journaling"><span class="label-text">ジャーナリング</span><span class="streak" data-streak="journaling"></span></label></li>
-  </ul>
+  <div id="daily-content"></div>
 </section>
 
 <section id="weekly-section">
   <h2 class="section-title">📅 今週のチェック<span class="weekly-info" id="weekly-label"></span></h2>
-  <ul>
-    <li><label><input type="checkbox" data-week-key="note"><span class="label-text">📝 note 発信</span></label></li>
-    <li><label><input type="checkbox" data-week-key="facilitation"><span class="label-text">🇬🇧 ミーティング録画ファシリ練習（週1時間）</span></label></li>
-    <li><label><input type="checkbox" data-week-key="weighIn"><span class="label-text">⚖️ 体重・体脂肪率を計測</span></label></li>
-    <li><label><input type="checkbox" data-week-key="bodyPhoto"><span class="label-text">📷 体の写真記録</span></label></li>
-  </ul>
+  <ul id="weekly-list"></ul>
 </section>
 
 <section id="calendar-section">
@@ -333,8 +381,9 @@
 </section>
 
 <footer>
-  <h2 class="section-title">⚙️ データ管理</h2>
+  <h2 class="section-title">⚙️ 設定・データ</h2>
   <div class="data-buttons">
+    <button class="data-btn primary" id="btn-manage">項目を編集</button>
     <button class="data-btn" id="btn-export">エクスポート</button>
     <button class="data-btn" id="btn-import">インポート</button>
     <button class="data-btn danger" id="btn-reset">リセット</button>
@@ -343,33 +392,62 @@
   <div class="data-msg" id="data-msg"></div>
 </footer>
 
+<!-- Day detail modal -->
 <div class="modal-backdrop" id="modal-backdrop">
   <div class="modal">
     <h3 id="modal-title"></h3>
-    <ul id="modal-body"></ul>
+    <ul id="modal-body" class="detail-list"></ul>
     <button class="modal-close" id="modal-close">閉じる</button>
+  </div>
+</div>
+
+<!-- Management modal -->
+<div class="modal-backdrop" id="manage-backdrop">
+  <div class="modal">
+    <h3>📝 項目を編集</h3>
+    <p style="font-size:0.8rem;color:var(--text-muted);margin:0 0 12px;">変更は自動保存されます。過去のチェック記録は削除しても残ります。</p>
+
+    <h4>毎日項目</h4>
+    <div id="manage-daily"></div>
+    <button class="add-btn" id="add-daily">＋ 毎日項目を追加</button>
+
+    <h4>週次項目</h4>
+    <div id="manage-weekly"></div>
+    <button class="add-btn" id="add-weekly">＋ 週次項目を追加</button>
+
+    <button class="modal-close" id="manage-close">完了</button>
   </div>
 </div>
 
 <script>
   const STORAGE_KEY = 'threePillarsTracker';
-  const DAILY_KEYS = ['shadowing', 'writing', 'training', 'protein', 'xPost', 'journaling'];
-  const DAILY_LABELS = {
-    shadowing: 'シャドーイング',
-    writing: '英作文',
-    training: '筋トレ',
-    protein: 'タンパク質',
-    xPost: 'X発信',
-    journaling: 'ジャーナリング'
+
+  const PILLARS = [
+    { id: 'english',  emoji: '🇬🇧', label: '英語' },
+    { id: 'training', emoji: '💪', label: '筋トレ' },
+    { id: 'side',     emoji: '💼', label: '副業' },
+    { id: 'selfcare', emoji: '📓', label: 'セルフケア' }
+  ];
+
+  const DEFAULT_ITEMS = {
+    daily: [
+      { id: 'shadowing',  label: 'シャドーイング 30分',         pillar: 'english' },
+      { id: 'writing',    label: '英作文・フレーズ暗記 30分',   pillar: 'english' },
+      { id: 'training',   label: '筋トレ',                       pillar: 'training' },
+      { id: 'protein',    label: 'タンパク質 140g 達成',         pillar: 'training' },
+      { id: 'xPost',      label: 'X発信（1投稿以上）',           pillar: 'side' },
+      { id: 'journaling', label: 'ジャーナリング',               pillar: 'selfcare' }
+    ],
+    weekly: [
+      { id: 'note',          label: '📝 note 発信' },
+      { id: 'facilitation',  label: '🇬🇧 ミーティング録画ファシリ練習（週1時間）' },
+      { id: 'weighIn',       label: '⚖️ 体重・体脂肪率を計測' },
+      { id: 'bodyPhoto',     label: '📷 体の写真記録' }
+    ]
   };
-  const WEEK_KEYS = ['note', 'facilitation', 'weighIn', 'bodyPhoto'];
 
   function pad2(n) { return String(n).padStart(2, '0'); }
-
-  function dateToStr(d) {
-    return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`;
-  }
-
+  function dateToStr(d) { return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`; }
   function todayStr() { return dateToStr(new Date()); }
 
   function getISOWeek(date) {
@@ -381,12 +459,17 @@
     return `${d.getUTCFullYear()}-W${pad2(weekNum)}`;
   }
 
+  function genId(prefix) {
+    return `${prefix}_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 6)}`;
+  }
+
   function loadData() {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) {
       return {
-        version: '1.0',
+        version: '1.1',
         settings: { createdAt: new Date().toISOString() },
+        items: JSON.parse(JSON.stringify(DEFAULT_ITEMS)),
         dailyRecords: {},
         weeklyRecords: {}
       };
@@ -394,6 +477,15 @@
     const data = JSON.parse(raw);
     if (!data.weeklyRecords) data.weeklyRecords = {};
     if (!data.dailyRecords) data.dailyRecords = {};
+    if (!data.items) {
+      data.items = JSON.parse(JSON.stringify(DEFAULT_ITEMS));
+    }
+    if (!Array.isArray(data.items.daily)) data.items.daily = [];
+    if (!Array.isArray(data.items.weekly)) data.items.weekly = [];
+    data.items.daily.forEach(it => {
+      if (!it.pillar || !PILLARS.find(p => p.id === it.pillar)) it.pillar = 'selfcare';
+    });
+    data.version = '1.1';
     return data;
   }
 
@@ -401,35 +493,41 @@
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
   }
 
+  function getDailyKeys(data) { return data.items.daily.map(it => it.id); }
+  function getWeeklyKeys(data) { return data.items.weekly.map(it => it.id); }
+
   function getTodayRecord(data) {
     const key = todayStr();
-    if (!data.dailyRecords[key]) {
-      data.dailyRecords[key] = {};
-      DAILY_KEYS.forEach(k => data.dailyRecords[key][k] = false);
-    }
+    if (!data.dailyRecords[key]) data.dailyRecords[key] = {};
+    getDailyKeys(data).forEach(k => {
+      if (data.dailyRecords[key][k] === undefined) data.dailyRecords[key][k] = false;
+    });
     return data.dailyRecords[key];
   }
 
   function getThisWeekRecord(data) {
     const key = getISOWeek(new Date());
-    if (!data.weeklyRecords[key]) {
-      data.weeklyRecords[key] = {};
-      WEEK_KEYS.forEach(k => data.weeklyRecords[key][k] = false);
-    }
+    if (!data.weeklyRecords[key]) data.weeklyRecords[key] = {};
+    getWeeklyKeys(data).forEach(k => {
+      if (data.weeklyRecords[key][k] === undefined) data.weeklyRecords[key][k] = false;
+    });
     return data.weeklyRecords[key];
   }
 
-  function calcCompletion(record) {
-    if (!record) return 0;
-    const done = DAILY_KEYS.filter(k => record[k]).length;
-    return done / DAILY_KEYS.length;
+  function calcCompletion(record, dailyKeys) {
+    if (!record || dailyKeys.length === 0) return 0;
+    const done = dailyKeys.filter(k => record[k]).length;
+    return done / dailyKeys.length;
   }
 
-  function updateSummary(record) {
-    const done = DAILY_KEYS.filter(k => record[k]).length;
-    const total = DAILY_KEYS.length;
-    const pct = Math.round((done / total) * 100);
-    document.getElementById('today-summary').textContent = `今日: ${done}/${total} 達成（${pct}%）`;
+  function updateSummary(data) {
+    const record = getTodayRecord(data);
+    const dailyKeys = getDailyKeys(data);
+    const done = dailyKeys.filter(k => record[k]).length;
+    const total = dailyKeys.length;
+    const pct = total === 0 ? 0 : Math.round((done / total) * 100);
+    document.getElementById('today-summary').textContent =
+      total === 0 ? '項目がありません' : `今日: ${done}/${total} 達成（${pct}%）`;
   }
 
   function calcStreak(data, key) {
@@ -438,10 +536,7 @@
     const todayRec = data.dailyRecords[todayKey];
     let streak = 0;
     let cursor = new Date(today);
-
-    if (!todayRec || !todayRec[key]) {
-      cursor.setDate(cursor.getDate() - 1);
-    }
+    if (!todayRec || !todayRec[key]) cursor.setDate(cursor.getDate() - 1);
     while (true) {
       const k = dateToStr(cursor);
       const rec = data.dailyRecords[k];
@@ -453,6 +548,96 @@
       }
     }
     return streak;
+  }
+
+  function renderDailyChecklist(data) {
+    const container = document.getElementById('daily-content');
+    container.innerHTML = '';
+    const record = getTodayRecord(data);
+
+    if (data.items.daily.length === 0) {
+      container.innerHTML = '<p class="empty-msg">毎日項目がありません。「項目を編集」から追加してください。</p>';
+      return;
+    }
+
+    const byPillar = {};
+    data.items.daily.forEach(it => {
+      if (!byPillar[it.pillar]) byPillar[it.pillar] = [];
+      byPillar[it.pillar].push(it);
+    });
+
+    PILLARS.forEach(p => {
+      const items = byPillar[p.id];
+      if (!items || items.length === 0) return;
+      const h2 = document.createElement('h2');
+      h2.className = p.id;
+      h2.textContent = `${p.emoji} ${p.label}`;
+      container.appendChild(h2);
+      const ul = document.createElement('ul');
+      items.forEach(it => {
+        const li = document.createElement('li');
+        li.className = `task ${p.id}`;
+        const label = document.createElement('label');
+        label.className = 'task-label';
+        const cb = document.createElement('input');
+        cb.type = 'checkbox';
+        cb.className = 'task-cb';
+        cb.checked = !!record[it.id];
+        cb.addEventListener('change', () => {
+          const d = loadData();
+          const r = getTodayRecord(d);
+          r[it.id] = cb.checked;
+          saveData(d);
+          updateSummary(d);
+          updateStreaks(d);
+          renderCalendar(d);
+        });
+        const text = document.createElement('span');
+        text.className = 'label-text';
+        text.textContent = it.label;
+        const streakSpan = document.createElement('span');
+        streakSpan.className = 'streak';
+        streakSpan.dataset.streak = it.id;
+        label.append(cb, text, streakSpan);
+        li.appendChild(label);
+        ul.appendChild(li);
+      });
+      container.appendChild(ul);
+    });
+  }
+
+  function renderWeeklyChecklist(data) {
+    const ul = document.getElementById('weekly-list');
+    ul.innerHTML = '';
+    const weekRec = getThisWeekRecord(data);
+
+    if (data.items.weekly.length === 0) {
+      ul.innerHTML = '<li class="empty-msg" style="background:none;border:none">週次項目がありません</li>';
+      return;
+    }
+
+    data.items.weekly.forEach(it => {
+      const li = document.createElement('li');
+      li.className = 'task';
+      const label = document.createElement('label');
+      label.className = 'task-label';
+      const cb = document.createElement('input');
+      cb.type = 'checkbox';
+      cb.className = 'task-cb';
+      cb.checked = !!weekRec[it.id];
+      cb.addEventListener('change', () => {
+        const d = loadData();
+        const wr = getThisWeekRecord(d);
+        wr[it.id] = cb.checked;
+        saveData(d);
+      });
+      const text = document.createElement('span');
+      text.className = 'label-text';
+      text.textContent = it.label;
+      label.append(cb, text);
+      li.appendChild(label);
+      ul.appendChild(li);
+    });
   }
 
   function updateStreaks(data) {
@@ -474,16 +659,13 @@
     cal.innerHTML = '';
     const today = new Date();
     const todayKey = dateToStr(today);
-    const cells = [];
+    const dailyKeys = getDailyKeys(data);
     for (let i = 29; i >= 0; i--) {
       const d = new Date(today);
       d.setDate(d.getDate() - i);
-      cells.push(d);
-    }
-    cells.forEach(d => {
       const key = dateToStr(d);
       const rec = data.dailyRecords[key];
-      const pct = calcCompletion(rec);
+      const pct = calcCompletion(rec, dailyKeys);
       const cell = document.createElement('div');
       cell.className = 'cal-cell';
       if (pct >= 1) cell.classList.add('l3');
@@ -491,32 +673,147 @@
       else if (pct > 0) cell.classList.add('l1');
       if (key === todayKey) cell.classList.add('today');
       cell.title = `${key} (${Math.round(pct * 100)}%)`;
-      cell.addEventListener('click', () => showDayDetail(key, rec));
+      cell.addEventListener('click', () => showDayDetail(key, rec, data));
       cal.appendChild(cell);
-    });
+    }
   }
 
-  function showDayDetail(dateKey, rec) {
+  function showDayDetail(dateKey, rec, data) {
     document.getElementById('modal-title').textContent = dateKey;
     const body = document.getElementById('modal-body');
     body.innerHTML = '';
     if (!rec) {
       body.innerHTML = '<li>記録なし</li>';
     } else {
-      DAILY_KEYS.forEach(k => {
+      data.items.daily.forEach(it => {
         const li = document.createElement('li');
-        li.textContent = `${rec[k] ? '✅' : '⬜️'} ${DAILY_LABELS[k]}`;
+        li.textContent = `${rec[it.id] ? '✅' : '⬜️'} ${it.label}`;
         body.appendChild(li);
       });
     }
     document.getElementById('modal-backdrop').classList.add('show');
   }
 
-  function refreshAll() {
-    const data = loadData();
+  function refreshChecklists(data) {
+    renderDailyChecklist(data);
+    renderWeeklyChecklist(data);
+    updateSummary(data);
     updateStreaks(data);
     renderCalendar(data);
   }
+
+  // ---------- Management modal ----------
+
+  function renderManageList() {
+    const data = loadData();
+    const dailyEl = document.getElementById('manage-daily');
+    const weeklyEl = document.getElementById('manage-weekly');
+    dailyEl.innerHTML = '';
+    weeklyEl.innerHTML = '';
+
+    data.items.daily.forEach(it => {
+      dailyEl.appendChild(buildManageRow(it, true));
+    });
+    data.items.weekly.forEach(it => {
+      weeklyEl.appendChild(buildManageRow(it, false));
+    });
+  }
+
+  function buildManageRow(item, isDaily) {
+    const row = document.createElement('div');
+    row.className = 'manage-row';
+    row.dataset.id = item.id;
+
+    const text = document.createElement('input');
+    text.type = 'text';
+    text.value = item.label;
+    text.placeholder = isDaily ? '毎日のタスク名' : '週次のタスク名';
+    text.addEventListener('input', () => updateItemLabel(item.id, text.value, isDaily));
+    row.appendChild(text);
+
+    if (isDaily) {
+      const sel = document.createElement('select');
+      PILLARS.forEach(p => {
+        const opt = document.createElement('option');
+        opt.value = p.id;
+        opt.textContent = `${p.emoji} ${p.label}`;
+        if (p.id === item.pillar) opt.selected = true;
+        sel.appendChild(opt);
+      });
+      sel.addEventListener('change', () => updateItemPillar(item.id, sel.value));
+      row.appendChild(sel);
+    }
+
+    const del = document.createElement('button');
+    del.className = 'del';
+    del.textContent = '🗑';
+    del.title = '削除';
+    del.addEventListener('click', () => {
+      if (!confirm(`「${item.label || '(無題)'}」を削除しますか？\n過去のチェック記録は残ります。`)) return;
+      deleteItem(item.id, isDaily);
+    });
+    row.appendChild(del);
+
+    return row;
+  }
+
+  function updateItemLabel(id, label, isDaily) {
+    const data = loadData();
+    const list = isDaily ? data.items.daily : data.items.weekly;
+    const it = list.find(x => x.id === id);
+    if (!it) return;
+    it.label = label;
+    saveData(data);
+    refreshChecklists(data);
+  }
+
+  function updateItemPillar(id, pillar) {
+    const data = loadData();
+    const it = data.items.daily.find(x => x.id === id);
+    if (!it) return;
+    it.pillar = pillar;
+    saveData(data);
+    refreshChecklists(data);
+  }
+
+  function deleteItem(id, isDaily) {
+    const data = loadData();
+    if (isDaily) data.items.daily = data.items.daily.filter(x => x.id !== id);
+    else data.items.weekly = data.items.weekly.filter(x => x.id !== id);
+    saveData(data);
+    renderManageList();
+    refreshChecklists(data);
+  }
+
+  function addItem(isDaily) {
+    const data = loadData();
+    if (isDaily) {
+      data.items.daily.push({
+        id: genId('d'),
+        label: '',
+        pillar: 'selfcare'
+      });
+    } else {
+      data.items.weekly.push({
+        id: genId('w'),
+        label: ''
+      });
+    }
+    saveData(data);
+    renderManageList();
+    refreshChecklists(data);
+    // focus the newly added text input
+    const list = isDaily ? document.getElementById('manage-daily') : document.getElementById('manage-weekly');
+    const lastInput = list.querySelector('.manage-row:last-child input[type="text"]');
+    if (lastInput) lastInput.focus();
+  }
+
+  function openManageModal() {
+    renderManageList();
+    document.getElementById('manage-backdrop').classList.add('show');
+  }
+
+  // ---------- Data management ----------
 
   function showMsg(text, kind) {
     const el = document.getElementById('data-msg');
@@ -556,31 +853,17 @@
           return;
         }
         if (!parsed.weeklyRecords) parsed.weeklyRecords = {};
-        if (!parsed.version) parsed.version = '1.0';
+        if (!parsed.items) parsed.items = JSON.parse(JSON.stringify(DEFAULT_ITEMS));
+        if (!parsed.version) parsed.version = '1.1';
         if (!parsed.settings) parsed.settings = { createdAt: new Date().toISOString() };
         saveData(parsed);
-        showMsg('インポート完了。再描画します', 'success');
-        rebindCheckboxes();
-        refreshAll();
-        const todayRec = getTodayRecord(loadData());
-        updateSummary(todayRec);
+        showMsg('インポート完了', 'success');
+        refreshChecklists(loadData());
       } catch (err) {
         showMsg('読み込み失敗: ' + err.message, 'error');
       }
     };
     reader.readAsText(file);
-  }
-
-  function rebindCheckboxes() {
-    const data = loadData();
-    const record = getTodayRecord(data);
-    const weekRec = getThisWeekRecord(data);
-    document.querySelectorAll('input[data-key]').forEach(cb => {
-      cb.checked = !!record[cb.dataset.key];
-    });
-    document.querySelectorAll('input[data-week-key]').forEach(cb => {
-      cb.checked = !!weekRec[cb.dataset.weekKey];
-    });
   }
 
   function setupDataButtons() {
@@ -593,6 +876,8 @@
       if (file) importData(file);
       e.target.value = '';
     });
+
+    document.getElementById('btn-manage').addEventListener('click', openManageModal);
 
     const resetBtn = document.getElementById('btn-reset');
     let armed = false;
@@ -614,20 +899,17 @@
       resetBtn.textContent = 'リセット';
       resetBtn.classList.remove('armed');
       localStorage.removeItem(STORAGE_KEY);
-      rebindCheckboxes();
       const data = loadData();
       saveData(data);
-      const todayRec = getTodayRecord(data);
-      updateSummary(todayRec);
-      refreshAll();
-      showMsg('全データをリセットしました', 'success');
+      refreshChecklists(data);
+      showMsg('全データを初期化しました', 'success');
     });
   }
 
+  // ---------- Init ----------
+
   function init() {
     const data = loadData();
-    const record = getTodayRecord(data);
-    const weekRec = getThisWeekRecord(data);
     saveData(data);
 
     const now = new Date();
@@ -635,45 +917,26 @@
       `${now.getFullYear()}年${now.getMonth() + 1}月${now.getDate()}日 (${'日月火水木金土'[now.getDay()]})`;
     document.getElementById('weekly-label').textContent = `${getISOWeek(now)}`;
 
-    document.querySelectorAll('input[data-key]').forEach(cb => {
-      const key = cb.dataset.key;
-      cb.checked = !!record[key];
-      cb.addEventListener('change', () => {
-        const data = loadData();
-        const rec = getTodayRecord(data);
-        rec[key] = cb.checked;
-        saveData(data);
-        updateSummary(rec);
-        updateStreaks(data);
-        renderCalendar(data);
-      });
-    });
-
-    document.querySelectorAll('input[data-week-key]').forEach(cb => {
-      const key = cb.dataset.weekKey;
-      cb.checked = !!weekRec[key];
-      cb.addEventListener('change', () => {
-        const data = loadData();
-        const wr = getThisWeekRecord(data);
-        wr[key] = cb.checked;
-        saveData(data);
-      });
-    });
-
+    refreshChecklists(data);
     setupDataButtons();
 
+    // Day detail modal close
     document.getElementById('modal-close').addEventListener('click', () => {
       document.getElementById('modal-backdrop').classList.remove('show');
     });
-    document.getElementById('modal-backdrop').addEventListener('click', (e) => {
-      if (e.target.id === 'modal-backdrop') {
-        e.currentTarget.classList.remove('show');
-      }
+    document.getElementById('modal-backdrop').addEventListener('click', e => {
+      if (e.target.id === 'modal-backdrop') e.currentTarget.classList.remove('show');
     });
 
-    updateSummary(record);
-    updateStreaks(data);
-    renderCalendar(data);
+    // Manage modal close + add buttons
+    document.getElementById('manage-close').addEventListener('click', () => {
+      document.getElementById('manage-backdrop').classList.remove('show');
+    });
+    document.getElementById('manage-backdrop').addEventListener('click', e => {
+      if (e.target.id === 'manage-backdrop') e.currentTarget.classList.remove('show');
+    });
+    document.getElementById('add-daily').addEventListener('click', () => addItem(true));
+    document.getElementById('add-weekly').addEventListener('click', () => addItem(false));
   }
 
   init();
